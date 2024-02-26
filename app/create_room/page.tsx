@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
+import { createClient } from "@/utils/supabase/client";
 
 type Inputs = {
   theme: string;
@@ -10,6 +11,8 @@ type Inputs = {
 };
 
 export default function create_room() {
+  const supabase = createClient();
+
   const {
     register,
     handleSubmit,
@@ -17,7 +20,27 @@ export default function create_room() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    console.log(formData);
+    const { data, error } = await supabase
+      .from("stories")
+      .insert({
+        theme: formData.theme,
+        max_player_count: formData.playerCount,
+        loop_count: formData.loopCount,
+        grade_level: formData.gradeLevel,
+      })
+      .select();
+
+    console.log(data[0].id);
+
+    const {} = await supabase
+      .from("stories")
+      .update({ game_code: data[0].id.toString().substring(0, 8) })
+      .eq("id", data[0].id);
+  };
+
+  const setGameCode = async (id: string) => {};
 
   console.log(watch("theme")); // watch input value by passing the name of it
 
