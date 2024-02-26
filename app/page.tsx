@@ -29,23 +29,19 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="flex flex-col">
-        <h1 className="text-xl">Username:</h1>
-        <input type="text" id="username" name="username"></input>
-        <div className="flex flex-row">
-          <Link
-            href="/create_room"
-            className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
-          >
-            Create Room
-          </Link>
-          <Link
-            href="/join_room"
-            className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
-          >
-            Join Room
-          </Link>
-        </div>
+      <div className="flex flex-row">
+        <Link
+          href="/create_room"
+          className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+        >
+          Create Room
+        </Link>
+        <Link
+          href="/join_room"
+          className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+        >
+          Join Room
+        </Link>
       </div>
     </div>
   );
