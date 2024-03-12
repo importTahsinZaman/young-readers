@@ -65,7 +65,7 @@ export default function manage_room() {
       .eq("game_code", gamecode);
   };
 
-  const removePlayerButtons = storyData?.current_players.map(
+  const removePlayerButtons = storyData?.current_players?.map(
     (playerName: string) => (
       <button
         onClick={() => {

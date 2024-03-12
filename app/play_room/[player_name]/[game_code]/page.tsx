@@ -3,13 +3,15 @@
 import { createClient } from "@/utils/supabase/client";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function play_room() {
+  const router = useRouter();
   const supabase = createClient();
   const pathname = usePathname();
   const [gamecode, setGamecode] = useState("");
   const [playerName, setPlayerName] = useState("");
-  const [notes, setNotes] = useState<any[] | null>(null);
+  const [storyData, setStoryData] = useState<any[] | null>(null);
 
   useEffect(() => {
     const slug = pathname.substring(11, 19);
@@ -22,13 +24,17 @@ export default function play_room() {
         .from("stories")
         .select("*")
         .eq("game_code", slug);
-      setNotes(data[0]);
+      setStoryData(data[0]);
     };
     getData();
   }, [pathname]);
 
-  const handleInserts = (payload: any) => {
-    setNotes(payload.new);
+  const handleChanges = (payload: any) => {
+    if (!payload.new.current_players.includes(playerName)) {
+      router.push(`/`);
+    } else {
+      setStoryData(payload.new);
+    }
   };
 
   // Listen to inserts
@@ -42,9 +48,9 @@ export default function play_room() {
         table: "stories",
         filter: `game_code=eq.${gamecode}`,
       },
-      handleInserts
+      handleChanges
     )
     .subscribe();
 
-  return <pre>{JSON.stringify(notes, null, 2)}</pre>;
+  return <pre>{JSON.stringify(storyData, null, 2)}</pre>;
 }

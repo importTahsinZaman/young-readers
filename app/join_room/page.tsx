@@ -31,7 +31,7 @@ export default function join_room() {
 
     if (story_data.current_player_count >= story_data.max_player_count) {
       alert("MAX PLAYERS REACHED!");
-    } else if (data[0].current_players.includes(formData.name)) {
+    } else if (data[0].current_players?.includes(formData.name)) {
       alert("THIS PLAYER IS ALREADY IN THE ROOM!");
     } else {
       const newPlayerCount = story_data.current_player_count + 1;
