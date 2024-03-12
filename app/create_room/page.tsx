@@ -2,6 +2,7 @@
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 type Inputs = {
   theme: string;
@@ -12,6 +13,7 @@ type Inputs = {
 
 export default function create_room() {
   const supabase = createClient();
+  const router = useRouter();
 
   const {
     register,
@@ -31,16 +33,15 @@ export default function create_room() {
         grade_level: formData.gradeLevel,
       })
       .select();
-
     console.log(data[0].id);
 
     const {} = await supabase
       .from("stories")
       .update({ game_code: data[0].id.toString().substring(0, 8) })
       .eq("id", data[0].id);
-  };
 
-  console.log(watch("theme")); // watch input value by passing the name of it
+    router.push(`/manage_room/${data[0].id.toString().substring(0, 8)}`);
+  };
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
