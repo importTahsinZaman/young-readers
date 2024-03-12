@@ -8,11 +8,14 @@ export default function play_room() {
   const supabase = createClient();
   const pathname = usePathname();
   const [gamecode, setGamecode] = useState("");
+  const [playerName, setPlayerName] = useState("");
   const [notes, setNotes] = useState<any[] | null>(null);
 
   useEffect(() => {
-    const slug = pathname.substring(pathname.lastIndexOf("/") + 1);
+    const slug = pathname.substring(11, 19);
+    const playerName = pathname.substring(pathname.lastIndexOf("/") + 1);
     setGamecode(slug);
+    setPlayerName(playerName);
 
     const getData = async () => {
       const { data } = await supabase
