@@ -19,10 +19,29 @@ export default function manage_room() {
         .from("stories")
         .select("*")
         .eq("game_code", slug);
-      setNotes(data);
+      setNotes(data[0]);
     };
     getData();
   }, [pathname]);
+
+  const handleInserts = (payload: any) => {
+    setNotes(payload.new);
+  };
+
+  // Listen to inserts
+  supabase
+    .channel("stories")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "stories",
+        filter: `game_code=eq.${gamecode}`,
+      },
+      handleInserts
+    )
+    .subscribe();
 
   return <pre>{JSON.stringify(notes, null, 2)}</pre>;
 }
