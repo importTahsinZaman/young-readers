@@ -8,7 +8,7 @@ export default function manage_room() {
   const supabase = createClient();
   const pathname = usePathname();
   const [gamecode, setGamecode] = useState("");
-  const [notes, setNotes] = useState<any[] | null>(null);
+  const [storyData, setStoryData] = useState<any[] | null>(null);
 
   useEffect(() => {
     const slug = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -19,16 +19,16 @@ export default function manage_room() {
         .from("stories")
         .select("*")
         .eq("game_code", slug);
-      setNotes(data[0]);
+      setStoryData(data[0]);
     };
     getData();
   }, [pathname]);
 
-  const handleInserts = (payload: any) => {
-    setNotes(payload.new);
+  const handleChanges = (payload: any) => {
+    setStoryData(payload.new);
   };
 
-  // Listen to inserts
+  // Listen to changes
   supabase
     .channel("stories")
     .on(
@@ -39,9 +39,48 @@ export default function manage_room() {
         table: "stories",
         filter: `game_code=eq.${gamecode}`,
       },
-      handleInserts
+      handleChanges
     )
     .subscribe();
 
-  return <pre>{JSON.stringify(notes, null, 2)}</pre>;
+  const removePlayer = async (playerName: string) => {
+    const { data, error } = await supabase
+      .from("stories")
+      .select("*")
+      .eq("game_code", gamecode);
+
+    let story_data = data[0];
+
+    const newPlayerCount = story_data.current_player_count - 1;
+
+    const playerIndex = storyData?.current_players.indexOf(playerName);
+    storyData?.current_players.splice(playerIndex, 1);
+
+    await supabase
+      .from("stories")
+      .update({
+        current_player_count: newPlayerCount,
+        current_players: storyData?.current_players,
+      })
+      .eq("game_code", gamecode);
+  };
+
+  const removePlayerButtons = storyData?.current_players.map(
+    (playerName: string) => (
+      <button
+        onClick={() => {
+          removePlayer(playerName);
+        }}
+      >
+        {playerName}
+      </button>
+    )
+  );
+
+  return (
+    <>
+      <pre>{JSON.stringify(storyData, null, 2)}</pre>
+      {removePlayerButtons}
+    </>
+  );
 }
