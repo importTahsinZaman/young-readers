@@ -20,13 +20,13 @@ export default function join_room() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
-    console.log(formData);
-
+    //attempt to find room data:
     const { data, error } = await supabase
       .from("stories")
       .select("*")
       .eq("game_code", formData.gamecode);
 
+    //check if room under that gamecode actually exists:
     if (data[0]) {
       const story_data = data[0];
 

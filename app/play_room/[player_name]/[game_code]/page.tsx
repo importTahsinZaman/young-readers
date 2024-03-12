@@ -25,6 +25,10 @@ export default function play_room() {
         .select("*")
         .eq("game_code", slug);
       setStoryData(data[0]);
+
+      if (!data[0].current_players.includes(playerName)) {
+        router.push(`/`);
+      }
     };
     getData();
   }, [pathname]);
