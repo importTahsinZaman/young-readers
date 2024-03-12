@@ -40,8 +40,6 @@ export default function create_room() {
       .eq("id", data[0].id);
   };
 
-  const setGameCode = async (id: string) => {};
-
   console.log(watch("theme")); // watch input value by passing the name of it
 
   return (
