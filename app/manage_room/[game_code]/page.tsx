@@ -38,7 +38,14 @@ export default function manage_room() {
       payload.new.recent_choice_made != null &&
       payload.new.recent_choice_made != payload.old.recent_choice_made
     ) {
-      runNextLoop(payload.new.recent_choice_made);
+      if (
+        payload.new.current_loop ==
+        payload.new.max_player_count * payload.new.loop_count
+      ) {
+        runFinalLoop(payload.new.recent_choice_made);
+      } else {
+        runNextLoop(payload.new.recent_choice_made);
+      }
     }
   };
 
@@ -181,6 +188,48 @@ export default function manage_room() {
         current_loop_json: completion.choices[0].message,
         current_player_choosing: currentPlayerChoosing,
         current_loop: storyData?.current_loop + 1,
+      })
+      .eq("game_code", gamecode);
+  }
+
+  async function runFinalLoop(choiceMade: string) {
+    console.log("Running final loop...");
+    const queryMessage = [
+      ...storyData?.all_loop_json,
+      {
+        role: "user",
+        content:
+          "Choice: " +
+          choiceMade.toString() +
+          ". Your next response is the final loop. This loop should end the story, and NOT give any player a choice to make. Keep using the same JSON format, but return null for player choice and choice options",
+      },
+    ];
+
+    console.log(queryMessage);
+
+    const completion = await openai.chat.completions.create({
+      messages: queryMessage,
+      model: "gpt-3.5-turbo",
+    });
+
+    const allLoopJSON = [
+      ...storyData?.all_loop_json,
+      {
+        role: "user",
+        content: choiceMade,
+      },
+      completion.choices[0].message,
+    ];
+
+    await supabase
+      .from("stories")
+      .update({
+        recent_choice_made: null,
+        all_loop_json: allLoopJSON,
+        current_loop_json: completion.choices[0].message,
+        current_player_choosing: null,
+        current_loop: storyData?.current_loop + 1,
+        story_finished: true,
       })
       .eq("game_code", gamecode);
   }
