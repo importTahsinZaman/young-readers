@@ -27,26 +27,30 @@ export default function join_room() {
       .select("*")
       .eq("game_code", formData.gamecode);
 
-    console.log(data[0]);
+    const story_data = data[0];
 
-    const newPlayerCount = data[0].current_player_count + 1;
-    let newPlayerArray = data[0].current_players;
+    if (story_data.current_player_count < story_data.max_player_count) {
+      const newPlayerCount = story_data.current_player_count + 1;
+      let newPlayerArray = story_data.current_players;
 
-    if (data[0].current_players) {
-      newPlayerArray.push(formData.name);
+      if (story_data.current_players) {
+        newPlayerArray.push(formData.name);
+      } else {
+        newPlayerArray = [formData.name];
+      }
+
+      await supabase
+        .from("stories")
+        .update({
+          current_player_count: newPlayerCount,
+          current_players: newPlayerArray,
+        })
+        .eq("game_code", formData.gamecode);
+
+      router.push(`/play_room/${formData.gamecode}`);
     } else {
-      newPlayerArray = [formData.name];
+      alert("max player count reached!!");
     }
-
-    await supabase
-      .from("stories")
-      .update({
-        current_player_count: newPlayerCount,
-        current_players: newPlayerArray,
-      })
-      .eq("game_code", formData.gamecode);
-
-    router.push(`/play_room/${formData.gamecode}`);
   };
 
   return (
