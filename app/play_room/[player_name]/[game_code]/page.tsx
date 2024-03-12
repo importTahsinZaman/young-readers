@@ -56,5 +56,5 @@ export default function play_room() {
     )
     .subscribe();
 
-  return <pre>{JSON.stringify(storyData, null, 2)}</pre>;
+  return <pre>{JSON.stringify(storyData?.current_loop_json, null, 2)}</pre>;
 }
