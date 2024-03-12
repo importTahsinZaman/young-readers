@@ -29,7 +29,11 @@ export default function join_room() {
 
     const story_data = data[0];
 
-    if (story_data.current_player_count < story_data.max_player_count) {
+    if (story_data.current_player_count >= story_data.max_player_count) {
+      alert("MAX PLAYERS REACHED!");
+    } else if (data[0].current_players.includes(formData.name)) {
+      alert("THIS PLAYER IS ALREADY IN THE ROOM!");
+    } else {
       const newPlayerCount = story_data.current_player_count + 1;
       let newPlayerArray = story_data.current_players;
 
@@ -47,9 +51,7 @@ export default function join_room() {
         })
         .eq("game_code", formData.gamecode);
 
-      router.push(`/play_room/${formData.gamecode}`);
-    } else {
-      alert("max player count reached!!");
+      router.push(`/play_room/${formData.gamecode}/${formData.name}`);
     }
   };
 
