@@ -32,6 +32,14 @@ export default function manage_room() {
 
   const handleChanges = (payload: any) => {
     setStoryData(payload.new);
+
+    if (
+      payload.eventType == "UPDATE" &&
+      payload.new.recent_choice_made != null &&
+      payload.new.recent_choice_made != payload.old.recent_choice_made
+    ) {
+      runNextLoop(payload.new.recent_choice_made);
+    }
   };
 
   // Listen to changes
@@ -74,6 +82,7 @@ export default function manage_room() {
   const removePlayerButtons = storyData?.current_players?.map(
     (playerName: string) => (
       <button
+        key={playerName}
         onClick={() => {
           removePlayer(playerName);
         }}
@@ -83,9 +92,27 @@ export default function manage_room() {
     )
   );
 
-  async function testOpenAI() {
-    const completion = await openai.chat.completions.create({
-      messages: [
+  async function startStory() {
+    if (storyData.current_player_count != storyData.max_player_count) {
+      alert("Max players not reached!");
+    } else {
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful assistant.`,
+          },
+          {
+            role: "user",
+            content: `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 3 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`,
+          },
+        ],
+        model: "gpt-3.5-turbo",
+      });
+
+      console.log(completion.choices[0].message);
+
+      const allLoopJSON = [
         {
           role: "system",
           content: `You are a helpful assistant.`,
@@ -94,33 +121,87 @@ export default function manage_room() {
           role: "user",
           content: `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 3 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`,
         },
-        // {
-        //   role: "assistant",
-        //   content:
-        //     '{\n  "loop": 1,\n  "loop_text": "It\'s a beautiful day for a soccer match. The four friends, John, Joe, Mary, and Phoebe, are all geared up and ready to play. As they step onto the field, they notice a group of older kids challenging them to a friendly match. What should they do?",\n  "user_choice": "John",\n  "choices": {\n    "1": "Accept the challenge and play against the older kids.",\n    "2": "Politely decline and continue with their own game.",\n    "3": "Suggest a mixed team game where they all play together."\n  }\n}',
-        // },
-        // {
-        //   role: "user",
-        //   content: "1",
-        // },
-      ],
+        completion.choices[0].message,
+      ];
+
+      const currentPlayerChoosing = JSON.parse(
+        completion.choices[0].message.content
+      ).user_choice;
+
+      console.log(currentPlayerChoosing);
+
+      await supabase
+        .from("stories")
+        .update({
+          all_loop_json: allLoopJSON,
+          story_started: true,
+          current_loop_json: completion.choices[0].message,
+          current_player_choosing: currentPlayerChoosing,
+          current_loop: 1,
+        })
+        .eq("game_code", gamecode);
+    }
+  }
+
+  async function runNextLoop(choiceMade: string) {
+    console.log("Running next loop...");
+    const queryMessage = [
+      ...storyData?.all_loop_json,
+      {
+        role: "user",
+        content: choiceMade.toString(),
+      },
+    ];
+
+    console.log(queryMessage);
+
+    const completion = await openai.chat.completions.create({
+      messages: queryMessage,
       model: "gpt-3.5-turbo",
     });
 
-    console.log(completion.choices[0]);
+    const allLoopJSON = [
+      ...storyData?.all_loop_json,
+      {
+        role: "user",
+        content: choiceMade,
+      },
+      completion.choices[0].message,
+    ];
+
+    const currentPlayerChoosing = JSON.parse(
+      completion.choices[0].message.content
+    ).user_choice;
+
+    await supabase
+      .from("stories")
+      .update({
+        recent_choice_made: null,
+        all_loop_json: allLoopJSON,
+        current_loop_json: completion.choices[0].message,
+        current_player_choosing: currentPlayerChoosing,
+        current_loop: storyData?.current_loop + 1,
+      })
+      .eq("game_code", gamecode);
   }
 
   return (
     <>
-      <pre>{JSON.stringify(storyData, null, 2)}</pre>
-      {removePlayerButtons}
-      <button
-        onClick={() => {
-          testOpenAI();
-        }}
-      >
-        Test Open AI
-      </button>
+      <div className="max-w-[50%]">
+        <pre>{JSON.stringify(storyData, null, 2)}</pre>
+      </div>
+      {storyData?.story_started ? null : (
+        <div className="flex flex-col">
+          {removePlayerButtons}
+          <button
+            onClick={() => {
+              startStory();
+            }}
+          >
+            Start Story
+          </button>
+        </div>
+      )}
     </>
   );
 }

@@ -56,5 +56,47 @@ export default function play_room() {
     )
     .subscribe();
 
-  return <pre>{JSON.stringify(storyData?.current_loop_json, null, 2)}</pre>;
+  const setChoice = async (choice: number) => {
+    await supabase
+      .from("stories")
+      .update({
+        recent_choice_made: choice.toString(),
+      })
+      .eq("game_code", gamecode);
+  };
+
+  return (
+    <>
+      <div className="max-w-[50vw]">
+        <pre>
+          {JSON.stringify(storyData?.current_loop_json?.content, null, 2)}
+        </pre>
+      </div>
+      {storyData?.current_player_choosing == playerName ? (
+        <div className="flex flex-col">
+          <button
+            onClick={() => {
+              setChoice(1);
+            }}
+          >
+            1
+          </button>
+          <button
+            onClick={() => {
+              setChoice(2);
+            }}
+          >
+            2
+          </button>
+          <button
+            onClick={() => {
+              setChoice(3);
+            }}
+          >
+            3
+          </button>
+        </div>
+      ) : null}
+    </>
+  );
 }
