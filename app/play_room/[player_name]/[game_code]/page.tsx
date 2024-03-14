@@ -12,6 +12,12 @@ export default function play_room() {
   const [gamecode, setGamecode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [storyData, setStoryData] = useState<any[] | null>(null);
+  //
+  const [currentLoopNumber, setCurrentLoopNumber] = useState(1);
+  const [loopText, setLoopText] = useState("");
+  const [userToMakeChoice, setUserToMakeChoice] = useState("");
+  const [choiceOptions, setChoiceOptions] = useState("");
+  //
 
   useEffect(() => {
     const slug = pathname.substring(11, 19);
@@ -26,6 +32,14 @@ export default function play_room() {
         .eq("game_code", slug);
       setStoryData(data[0]);
 
+      //
+      const current_loop_data = JSON.parse(data[0]?.current_loop_json?.content);
+      setCurrentLoopNumber(current_loop_data.loop);
+      setLoopText(current_loop_data.loop_text);
+      setUserToMakeChoice(current_loop_data.user_choice);
+      setChoiceOptions(current_loop_data.choices);
+      //
+
       if (!data[0].current_players.includes(playerName)) {
         router.push(`/`);
       }
@@ -38,6 +52,15 @@ export default function play_room() {
       router.push(`/`);
     } else {
       setStoryData(payload.new);
+      //
+      const current_loop_data = JSON.parse(
+        payload.new?.current_loop_json?.content
+      );
+      setCurrentLoopNumber(current_loop_data.loop);
+      setLoopText(current_loop_data.loop_text);
+      setUserToMakeChoice(current_loop_data.user_choice);
+      setChoiceOptions(current_loop_data.choices);
+      //
     }
   };
 
@@ -68,9 +91,12 @@ export default function play_room() {
   return (
     <>
       <div className="max-w-[50vw]">
-        <pre>
-          {JSON.stringify(storyData?.current_loop_json?.content, null, 2)}
-        </pre>
+        <h1>Current Loop Number: {currentLoopNumber}</h1>
+        <h1>User to make choice: {userToMakeChoice}</h1>
+        <h1>Loop Text: {loopText}</h1>
+        <h1>Choice Option 1: {choiceOptions[1]}</h1>
+        <h1>Choice Option 2: {choiceOptions[2]}</h1>
+        <h1>Choice Option 3: {choiceOptions[3]}</h1>
       </div>
       {storyData?.current_player_choosing == playerName ? (
         <div className="flex flex-col">
