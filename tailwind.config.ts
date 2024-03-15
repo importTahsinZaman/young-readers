@@ -15,6 +15,9 @@ module.exports = {
     transparent: "transparent",
     current: "currentColor",
     extend: {
+      fontFamily: {
+        DMSerifDisplay: ["DM Serif Display"],
+      }, //end of fontFamily
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

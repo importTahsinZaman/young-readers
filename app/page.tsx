@@ -21,24 +21,18 @@ export default async function Index() {
   const isSupabaseConnected = canInitSupabaseClient();
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <DeployButton />
-          {isSupabaseConnected && <AuthButton />}
-        </div>
-      </nav>
-
+    <div className="flex-1 w-full flex flex-col gap-10 items-center justify-center">
+      <h1 className="text-[10rem] font-DMSerifDisplay">Story Quest</h1>
       <div className="flex flex-row">
         <Link
           href="/create_room"
-          className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+          className="py-4 px-4 flex text-xl font-semibold rounded-md no-underline bg-btn-background hover:bg-btn-background-hover mx-3"
         >
           Create Room
         </Link>
         <Link
           href="/join_room"
-          className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+          className="py-4 px-7 text-xl font-semibold flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover mx-3"
         >
           Join Room
         </Link>
