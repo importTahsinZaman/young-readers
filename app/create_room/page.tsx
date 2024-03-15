@@ -44,45 +44,68 @@ export default function create_room() {
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-      <label>theme</label>
-      <input {...register("theme", { required: true })} />
-      {errors.theme && <span>Theme is required</span>}
+    <div className="flex-1 w-full flex flex-col items-center justify-center">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col max-w-[70%] w-[70%]"
+      >
+        <label className="text-lg">Theme</label>
+        <input {...register("theme", { required: true })} />
+        {errors.theme && (
+          <span className="text-red-500">Theme is required</span>
+        )}
 
-      <label>Number of Players:</label>
-      <input
-        type="number"
-        step="1"
-        max={5}
-        min={2}
-        defaultValue={2}
-        {...register("playerCount", { required: true })}
-      />
-      {errors.playerCount && <span>Player count is required</span>}
+        <label className="text-lg">Number of Players:</label>
+        <input
+          type="number"
+          step="1"
+          max={5}
+          min={2}
+          defaultValue={4}
+          {...register("playerCount", { required: true })}
+        />
+        {errors.playerCount && (
+          <span className="text-red-500">Player count is required</span>
+        )}
 
-      <label>Number of Loops:</label>
-      <input
-        type="number"
-        step="1"
-        max={5}
-        min={2}
-        defaultValue={2}
-        {...register("loopCount", { required: true })}
-      />
-      {errors.loopCount && <span>Loop count is required</span>}
+        <label className="text-lg">Number of Loops:</label>
+        <input
+          type="number"
+          step="1"
+          max={5}
+          min={2}
+          defaultValue={4}
+          {...register("loopCount", { required: true })}
+        />
+        {errors.loopCount && (
+          <span className="text-red-500">Loop count is required</span>
+        )}
 
-      <label>Grade Level:</label>
-      <input
-        type="number"
-        step="1"
-        max={5}
-        min={2}
-        defaultValue={2}
-        {...register("gradeLevel", { required: true })}
-      />
-      {errors.gradeLevel && <span>Grade level is required</span>}
+        <label className="text-lg">Grade Level:</label>
+        <input
+          type="number"
+          step="1"
+          max={5}
+          min={2}
+          defaultValue={5}
+          {...register("gradeLevel", { required: true })}
+        />
+        {errors.gradeLevel && (
+          <span className="text-red-500">Grade level is required</span>
+        )}
 
-      <input type="submit" />
-    </form>
+        <button className="border my-4 border-black p-4 text-lg" type="submit">
+          Create Story
+        </button>
+      </form>
+      <button
+        className="border my-4 border-black p-4 text-lg w-[70%] max-w-[70%]"
+        onClick={() => {
+          router.push("/");
+        }}
+      >
+        Return to Home
+      </button>
+    </div>
   );
 }

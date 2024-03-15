@@ -89,6 +89,7 @@ export default function manage_room() {
   const removePlayerButtons = storyData?.current_players?.map(
     (playerName: string) => (
       <button
+        className="border-2 border-black font-semibold p-3 rounded w-28 h-14 hover:border-red-500 hover:text-red-500"
         key={playerName}
         onClick={() => {
           removePlayer(playerName);
@@ -235,8 +236,34 @@ export default function manage_room() {
   }
 
   return (
-    <>
-      <div className="max-w-[50%]">
+    <div className="flex-1 w-full flex flex-col items-center justify-center">
+      {!storyData?.story_stated ? (
+        <div className="flex-1 w-full flex flex-col items-center justify-center">
+          <h1 className="text-4xl font-semibold">Story Code: {gamecode}</h1>
+          <h1 className="text-xl font-semibold">
+            Players Joined: {storyData?.current_player_count}/
+            {storyData?.max_player_count}
+          </h1>
+
+          <div className="flex flex-row my-4 gap-4">{removePlayerButtons}</div>
+
+          {storyData?.current_player_count !=
+          storyData?.max_player_count ? null : (
+            <button
+              className="border-2 border-black font-semibold text-lg p-3 rounded w-36 h-14 hover:border-green-500 hover:text-green-500"
+              onClick={() => {
+                startStory();
+              }}
+            >
+              Start Story!
+            </button>
+          )}
+        </div>
+      ) : (
+        <></>
+      )}
+
+      {/* <div className="max-w-[50%]">
         <pre>{JSON.stringify(storyData, null, 2)}</pre>
       </div>
       {storyData?.story_started ? null : (
@@ -250,7 +277,7 @@ export default function manage_room() {
             Start Story
           </button>
         </div>
-      )}
-    </>
+      )} */}
+    </div>
   );
 }
