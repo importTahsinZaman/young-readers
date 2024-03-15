@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Button } from "@tremor/react";
+import { Card } from "@tremor/react";
+
 export default function play_room() {
   const router = useRouter();
   const supabase = createClient();
@@ -89,40 +92,76 @@ export default function play_room() {
   };
 
   return (
-    <>
-      <div className="max-w-[50vw]">
-        <h1>Current Loop Number: {currentLoopNumber}</h1>
-        <h1>User to make choice: {userToMakeChoice}</h1>
-        <h1>Loop Text: {loopText}</h1>
-        <h1>Choice Option 1: {choiceOptions[1]}</h1>
-        <h1>Choice Option 2: {choiceOptions[2]}</h1>
-        <h1>Choice Option 3: {choiceOptions[3]}</h1>
-      </div>
-      {storyData?.current_player_choosing == playerName ? (
-        <div className="flex flex-col">
-          <button
-            onClick={() => {
-              setChoice(1);
-            }}
-          >
-            1
-          </button>
-          <button
-            onClick={() => {
-              setChoice(2);
-            }}
-          >
-            2
-          </button>
-          <button
-            onClick={() => {
-              setChoice(3);
-            }}
-          >
-            3
-          </button>
-        </div>
-      ) : null}
-    </>
+    <div className="flex flex-row items-center justify-center w-screen h-screen p-16">
+      <Card className="w-[100vw] min-h-[70vh] rounded">
+        <h1 className="text-lg">{loopText}</h1>
+        <br></br>
+        {storyData?.current_player_choosing == playerName ? (
+          <div className="flex flex-col">
+            <h1 className="text-lg">Make a choice!</h1>
+            <br></br>
+            <Button
+              color="gray"
+              variant="primary"
+              onClick={() => {
+                setChoice(1);
+              }}
+              className="text-[#04090b] text-lg border-none w-fit"
+            >
+              a. {choiceOptions[1]}
+            </Button>
+            <Button
+              color="gray"
+              variant="primary"
+              onClick={() => {
+                setChoice(2);
+              }}
+              className="text-[#04090b] text-lg border-none w-fit"
+            >
+              b. {choiceOptions[2]}
+            </Button>
+            <Button
+              color="gray"
+              variant="primary"
+              onClick={() => {
+                setChoice(3);
+              }}
+              className="text-[#04090b] text-lg border-none w-fit"
+            >
+              c. {choiceOptions[3]}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col ">
+            <h1 className="text-lg">{userToMakeChoice} is choosing...</h1>
+            <br></br>
+            <Button
+              disabled
+              color="gray"
+              variant="primary"
+              className="text-[#04090b] text-lg text-left border-none w-fit"
+            >
+              a. {choiceOptions[1]}
+            </Button>
+            <Button
+              disabled
+              color="gray"
+              variant="primary"
+              className="text-[#04090b] text-lg border-none w-fit"
+            >
+              b. {choiceOptions[2]}
+            </Button>
+            <Button
+              disabled
+              color="gray"
+              variant="primary"
+              className="text-[#04090b] text-lg border-none w-fit"
+            >
+              c. {choiceOptions[3]}
+            </Button>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }
