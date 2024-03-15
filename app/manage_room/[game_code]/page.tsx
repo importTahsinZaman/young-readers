@@ -237,7 +237,7 @@ export default function manage_room() {
 
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-center">
-      {!storyData?.story_stated ? (
+      {!storyData?.story_started ? (
         <div className="flex-1 w-full flex flex-col items-center justify-center">
           <h1 className="text-4xl font-semibold">Story Code: {gamecode}</h1>
           <h1 className="text-xl font-semibold">
@@ -260,7 +260,19 @@ export default function manage_room() {
           )}
         </div>
       ) : (
-        <></>
+        <div>
+          <h1 className="text-lg font-semibold">Theme: {storyData?.theme}</h1>
+          <h1 className="text-lg font-semibold">
+            Grade Level: {storyData?.grade_level}
+          </h1>
+          <h1 className="text-lg font-semibold">
+            Loop: {storyData?.current_loop}/{storyData?.loop_count}
+          </h1>
+          <h1 className="text-lg font-semibold">
+            Current Player Choosing: {storyData?.current_player_choosing}
+          </h1>
+          <h1>FINISH STYLING THIS PAGE!</h1>
+        </div>
       )}
 
       {/* <div className="max-w-[50%]">
