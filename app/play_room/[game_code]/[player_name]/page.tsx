@@ -107,91 +107,50 @@ export default function play_room() {
           </h1>
         )}
       </Card>
-      {storyData?.current_player_choosing == playerName ? (
-        <div className="flex flex-row w-full justify-between ">
-          <div className="basis-1/2 flex flex-col gap-6 mr-4">
-            <button
-              onClick={() => {
-                setChoice(1);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#03CD9D] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[1]}
-            </button>
-            <button
-              onClick={() => {
-                setChoice(2);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#EEAA26] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[2]}
-            </button>
-          </div>
 
-          <div className="basis-1/2 flex flex-col gap-6 ml-4">
-            <button
-              onClick={() => {
-                setChoice(3);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#E84646] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[3]}
-            </button>
-            <button
-              onClick={() => {
-                setChoice(4);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#59B941] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[4]}
-            </button>
-          </div>
+      <div className="flex flex-row w-full justify-between ">
+        <div className="basis-1/2 flex flex-col gap-6 mr-4">
+          <button
+            disabled={storyData?.current_player_choosing != playerName}
+            onClick={() => {
+              setChoice(1);
+            }}
+            className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#03CD9D] shadow text-white no-underline w-full"
+          >
+            {choiceOptions[1]}
+          </button>
+          <button
+            disabled={storyData?.current_player_choosing != playerName}
+            onClick={() => {
+              setChoice(2);
+            }}
+            className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#EEAA26] shadow text-white no-underline w-full"
+          >
+            {choiceOptions[2]}
+          </button>
         </div>
-      ) : (
-        <div className="flex flex-row w-full justify-between">
-          <div className="grow flex flex-col gap-6 mr-4">
-            <button
-              disabled
-              onClick={() => {
-                setChoice(1);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#03CD9D] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[1]}
-            </button>
-            <button
-              disabled
-              onClick={() => {
-                setChoice(2);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#EEAA26] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[2]}
-            </button>
-          </div>
 
-          <div className="grow flex flex-col gap-6 ml-4">
-            <button
-              disabled
-              onClick={() => {
-                setChoice(3);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#E84646] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[3]}
-            </button>
-            <button
-              disabled
-              onClick={() => {
-                setChoice(4);
-              }}
-              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#59B941] shadow text-white no-underline w-full"
-            >
-              {choiceOptions[4]}
-            </button>
-          </div>
+        <div className="basis-1/2 flex flex-col gap-6 ml-4">
+          <button
+            disabled={storyData?.current_player_choosing != playerName}
+            onClick={() => {
+              setChoice(3);
+            }}
+            className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#E84646] shadow text-white no-underline w-full"
+          >
+            {choiceOptions[3]}
+          </button>
+          <button
+            disabled={storyData?.current_player_choosing != playerName}
+            onClick={() => {
+              setChoice(4);
+            }}
+            className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#59B941] shadow text-white no-underline w-full"
+          >
+            {choiceOptions[4]}
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
