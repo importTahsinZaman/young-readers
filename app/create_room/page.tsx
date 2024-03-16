@@ -92,7 +92,7 @@ export default function create_room() {
           </div>
         </div>
 
-        <label className="text-2xl text-primaryBlue">Grade Level:</label>
+        <label className="text-2xl text-primaryBlue">Grade Level</label>
         <input
           type="number"
           step="1"

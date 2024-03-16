@@ -92,76 +92,88 @@ export default function play_room() {
   };
 
   return (
-    <div className="flex flex-row items-center justify-center w-screen h-screen p-16">
-      <Card className="w-[100vw] min-h-[70vh] rounded">
-        <h1 className="text-lg">{loopText}</h1>
-        <br></br>
+    <div className="flex flex-col items-center justify-center h-screen w-[80vw] gap-6">
+      <h1 className="text-[3rem]  text-primaryBlue">skytales</h1>
+      <Card className="flex flex-col min-h-[55vh] rounded mx-4 items-center justify-between shadow-lg p-10">
+        <div className="grow">
+          <h1 className="text-xl">{loopText}</h1>
+        </div>
+
         {storyData?.current_player_choosing == playerName ? (
-          <div className="flex flex-col">
-            <h1 className="text-lg">Make a choice!</h1>
-            <br></br>
-            <Button
-              color="gray"
-              variant="primary"
+          <h1 className="text-2xl text-semibold">Make a choice!</h1>
+        ) : (
+          <h1 className="text-2xl text-semibold">
+            {userToMakeChoice} is choosing...
+          </h1>
+        )}
+      </Card>
+      {storyData?.current_player_choosing == playerName ? (
+        <div className="flex flex-row w-full justify-between">
+          <div className="grow flex flex-col gap-6 mr-4">
+            <button
               onClick={() => {
                 setChoice(1);
               }}
-              className="text-[#04090b] text-lg border-none w-fit"
+              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#03CD9D] shadow text-white no-underline w-full"
             >
               a. {choiceOptions[1]}
-            </Button>
-            <Button
-              color="gray"
-              variant="primary"
+            </button>
+            <button
               onClick={() => {
                 setChoice(2);
               }}
-              className="text-[#04090b] text-lg border-none w-fit"
+              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#EEAA26] shadow text-white no-underline w-full"
             >
               b. {choiceOptions[2]}
-            </Button>
-            <Button
-              color="gray"
-              variant="primary"
+            </button>
+          </div>
+
+          <div className="grow flex flex-col gap-6 ml-4">
+            <button
               onClick={() => {
                 setChoice(3);
               }}
-              className="text-[#04090b] text-lg border-none w-fit"
+              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#E84646] shadow text-white no-underline w-full"
             >
               c. {choiceOptions[3]}
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col ">
-            <h1 className="text-lg">{userToMakeChoice} is choosing...</h1>
-            <br></br>
-            <Button
-              disabled
-              color="gray"
-              variant="primary"
-              className="text-[#04090b] text-lg text-left border-none w-fit"
-            >
-              a. {choiceOptions[1]}
-            </Button>
-            <Button
-              disabled
-              color="gray"
-              variant="primary"
-              className="text-[#04090b] text-lg border-none w-fit"
-            >
-              b. {choiceOptions[2]}
-            </Button>
-            <Button
-              disabled
-              color="gray"
-              variant="primary"
-              className="text-[#04090b] text-lg border-none w-fit"
+            </button>
+            <button
+              onClick={() => {
+                setChoice(3);
+              }}
+              className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#59B941] shadow text-white no-underline w-full"
             >
               c. {choiceOptions[3]}
-            </Button>
+            </button>
           </div>
-        )}
-      </Card>
+        </div>
+      ) : (
+        <div className="flex flex-col ">
+          <h1 className="text-lg">{userToMakeChoice} is choosing...</h1>
+          <br></br>
+          <Button
+            disabled
+            variant="primary"
+            className="text-[#04090b] text-lg text-left border-none "
+          >
+            a. {choiceOptions[1]}
+          </Button>
+          <Button
+            disabled
+            variant="primary"
+            className="text-[#04090b] text-lg border-none "
+          >
+            b. {choiceOptions[2]}
+          </Button>
+          <Button
+            disabled
+            variant="primary"
+            className="text-[#04090b] text-lg border-none "
+          >
+            c. {choiceOptions[3]}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
