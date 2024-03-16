@@ -89,6 +89,14 @@ export default function join_room() {
           join game!
         </button>
       </form>
+      <button
+        className="max-w-[40%] w-[40%] items-center justify-center py-4 flex text-2xl font-semibold rounded-full bg-primaryBlue shadow-2xl text-white no-underline"
+        onClick={() => {
+          router.push("/");
+        }}
+      >
+        return home
+      </button>
     </div>
   );
 }
