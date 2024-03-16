@@ -60,17 +60,35 @@ export default function join_room() {
   };
 
   return (
-    /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-      <label>Name:</label>
-      <input type="string" {...register("name", { required: true })} />
-      {errors.name && <span>Your name is required</span>}
+    <div className="flex-1 w-full flex flex-col items-center justify-center bg-join-bg bg-cover bg-no-repeat bg-center">
+      <h1 className="text-[8rem] text-white">skytales</h1>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4 max-w-[40%] w-[40%]"
+      >
+        <label className="text-white text-2xl">Your Name</label>
+        <input
+          className="rounded-xl border-2 border-primaryBlue shadow-inner text-xl py-2"
+          type="string"
+          {...register("name", { required: true })}
+        />
+        {errors.name && <span>Your name is required</span>}
 
-      <label>Game Code:</label>
-      <input type="string" {...register("gamecode", { required: true })} />
-      {errors.gamecode && <span>Game code is required</span>}
+        <label className="text-white text-2xl">Game Code</label>
+        <input
+          className="rounded-xl border-2 border-primaryBlue shadow-inner text-xl py-2"
+          type="string"
+          {...register("gamecode", { required: true })}
+        />
+        {errors.gamecode && <span>Game code is required</span>}
 
-      <input type="submit" />
-    </form>
+        <button
+          type="submit"
+          className="my-8 items-center justify-center py-4 flex text-2xl font-semibold rounded-full bg-white shadow-2xl text-primaryBlue no-underline"
+        >
+          join game!
+        </button>
+      </form>
+    </div>
   );
 }

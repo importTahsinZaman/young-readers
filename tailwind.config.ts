@@ -18,6 +18,7 @@ module.exports = {
       backgroundImage: {
         "home-bg": "url('/homeBackground.svg')",
         "create-bg": "url(/createRoomBackground.svg)",
+        "join-bg": "url(/joinRoomBackground.svg)",
       },
       fontFamily: {
         LoveYa: ["Love Ya Like A Sister"],
