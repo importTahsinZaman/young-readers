@@ -16,7 +16,8 @@ module.exports = {
     current: "currentColor",
     extend: {
       backgroundImage: {
-        "home-bg": "url('/background.svg')",
+        "home-bg": "url('/homeBackground.svg')",
+        "create-bg": "url(/createRoomBackground.svg)",
       },
       fontFamily: {
         LoveYa: ["Love Ya Like A Sister"],
