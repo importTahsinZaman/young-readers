@@ -21,21 +21,23 @@ export default async function Index() {
   const isSupabaseConnected = canInitSupabaseClient();
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-10 items-center justify-center">
-      <h1 className="text-[10rem] font-DMSerifDisplay">Story Quest</h1>
-      <div className="flex flex-row">
-        <Link
-          href="/create_room"
-          className="py-4 px-4 flex text-xl font-semibold rounded-md no-underline bg-btn-background hover:bg-btn-background-hover mx-3"
-        >
-          Create Room
-        </Link>
-        <Link
-          href="/join_room"
-          className="py-4 px-7 text-xl font-semibold flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover mx-3"
-        >
-          Join Room
-        </Link>
+    <div className="flex-1 w-full flex flex-col items-center justify-center bg-home-bg bg-cover bg-no-repeat bg-center">
+      <div>
+        <h1 className="text-[10rem] text-white">skytales</h1>
+        <div className="flex flex-col w-full gap-3">
+          <Link
+            href="/join_room"
+            className="items-center justify-center px-8 py-4 flex text-xl font-semibold rounded-full bg-white shadow-2xl text-primaryBlue no-underline"
+          >
+            join room!
+          </Link>
+          <Link
+            href="/create_room"
+            className="items-center justify-center px-8 py-4 flex text-xl font-semibold rounded-full bg-primaryBlue shadow-2xl text-white no-underline"
+          >
+            create room!
+          </Link>
+        </div>
       </div>
     </div>
   );

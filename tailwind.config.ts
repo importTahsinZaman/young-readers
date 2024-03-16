@@ -15,12 +15,16 @@ module.exports = {
     transparent: "transparent",
     current: "currentColor",
     extend: {
+      backgroundImage: {
+        "home-bg": "url('/background.svg')",
+      },
       fontFamily: {
-        DMSerifDisplay: ["DM Serif Display"],
+        LoveYa: ["Love Ya Like A Sister"],
       }, //end of fontFamily
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        primaryBlue: "#0DB7FF",
         btn: {
           background: "hsl(var(--btn-background))",
           "background-hover": "hsl(var(--btn-background-hover))",
