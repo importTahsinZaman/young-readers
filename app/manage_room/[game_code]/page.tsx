@@ -89,7 +89,7 @@ export default function manage_room() {
   const removePlayerButtons = storyData?.current_players?.map(
     (playerName: string) => (
       <button
-        className="border-2 border-black font-semibold p-3 rounded w-28 h-14 hover:border-red-500 hover:text-red-500"
+        className="border-2 border-primaryBlue text-primaryBlue font-semibold rounded-full w-44 h-14 hover:border-red-500 hover:text-red-500"
         key={playerName}
         onClick={() => {
           removePlayer(playerName);
@@ -236,10 +236,11 @@ export default function manage_room() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col items-center justify-center">
+    <div className="flex-1 w-full flex flex-col items-center justify-center bg-create-bg bg-cover bg-no-repeat bg-center gap-6">
+      <h1 className="text-[8rem] text-primaryBlue">skytales</h1>
       {!storyData?.story_started ? (
-        <div className="flex-1 w-full flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-semibold">Story Code: {gamecode}</h1>
+        <div className="flex w-full flex flex-col items-center justify-center">
+          <h1 className="text-4xl font-semibold">Game Code: {gamecode}</h1>
           <h1 className="text-xl font-semibold">
             Players Joined: {storyData?.current_player_count}/
             {storyData?.max_player_count}
@@ -250,12 +251,12 @@ export default function manage_room() {
           {storyData?.current_player_count !=
           storyData?.max_player_count ? null : (
             <button
-              className="border-2 border-black font-semibold text-lg p-3 rounded w-36 h-14 hover:border-green-500 hover:text-green-500"
+              className="text-white my-9 bg-primaryBlue font-semibold text-lg p-3 rounded-full w-96 h-14"
               onClick={() => {
                 startStory();
               }}
             >
-              Start Story!
+              begin story!
             </button>
           )}
         </div>
