@@ -104,6 +104,8 @@ export default function manage_room() {
     if (storyData.current_player_count != storyData.max_player_count) {
       alert("Max players not reached!");
     } else {
+      const initMessage = `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": “”, ”4”: "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. The choice options given to a player should be choices for what THAT player does in the story, a player should not receive choices that determine the actions of a different player in the story! Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 4 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! EACH LOOP SHOULD CONTAIN ABOUT 180 WORDS. Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`;
+
       const completion = await openai.chat.completions.create({
         messages: [
           {
@@ -112,13 +114,14 @@ export default function manage_room() {
           },
           {
             role: "user",
-            content: `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": “”, ”4”: "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 4 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! EACH LOOP SHOULD CONTAIN ABOUT 180 WORDS. Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`,
+            content: initMessage,
           },
         ],
         model: "gpt-3.5-turbo",
       });
 
       console.log(completion.choices[0].message);
+      console.log(typeof completion.choices[0].message);
 
       const allLoopJSON = [
         {
@@ -127,7 +130,7 @@ export default function manage_room() {
         },
         {
           role: "user",
-          content: `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": “”, ”4”: "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 4 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! EACH LOOP SHOULD CONTAIN ABOUT 180 WORDS. Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`,
+          content: initMessage,
         },
         completion.choices[0].message,
       ];
