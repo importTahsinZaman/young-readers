@@ -7,11 +7,13 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@tremor/react";
 import { Card } from "@tremor/react";
+import Loader from "@/components/loadingSpinner";
 
 export default function play_room() {
   const router = useRouter();
   const supabase = createClient();
   const pathname = usePathname();
+  const [loadingState, setLoadingState] = useState(false);
   const [gamecode, setGamecode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [storyData, setStoryData] = useState<any[] | null>(null);
@@ -21,6 +23,10 @@ export default function play_room() {
   const [userToMakeChoice, setUserToMakeChoice] = useState("");
   const [choiceOptions, setChoiceOptions] = useState("");
   //
+
+  useEffect(() => {
+    setLoadingState(false);
+  }, []);
 
   useEffect(() => {
     const slug = pathname.substring(11, 19);
@@ -36,14 +42,22 @@ export default function play_room() {
       setStoryData(data[0]);
 
       //
-      const current_loop_data = JSON.parse(data[0]?.current_loop_json?.content);
-      setCurrentLoopNumber(current_loop_data.loop);
-      setLoopText(current_loop_data.loop_text);
-      setUserToMakeChoice(current_loop_data.user_choice);
-      setChoiceOptions(current_loop_data.choices);
+      if (data[0]?.story_started) {
+        const current_loop_data = JSON.parse(
+          data[0]?.current_loop_json?.content
+        );
+        setCurrentLoopNumber(current_loop_data.loop);
+        setLoopText(current_loop_data.loop_text);
+        setUserToMakeChoice(current_loop_data.user_choice);
+        setChoiceOptions(current_loop_data.choices);
+      }
       //
 
-      if (!data[0].current_players.includes(playerName)) {
+      const lowerCasePlayersArray = data[0].current_players.map((string) =>
+        string.toLowerCase()
+      );
+
+      if (!lowerCasePlayersArray.includes(playerName.toLowerCase())) {
         router.push(`/`);
       }
     };
@@ -51,18 +65,34 @@ export default function play_room() {
   }, [pathname]);
 
   const handleChanges = (payload: any) => {
-    if (!payload.new.current_players.includes(playerName)) {
+    const lowerCasePlayersArray = payload.new.current_players.map((string) =>
+      string.toLowerCase()
+    );
+
+    if (!lowerCasePlayersArray.includes(playerName.toLowerCase())) {
       router.push(`/`);
     } else {
       setStoryData(payload.new);
       //
-      const current_loop_data = JSON.parse(
-        payload.new?.current_loop_json?.content
-      );
-      setCurrentLoopNumber(current_loop_data.loop);
-      setLoopText(current_loop_data.loop_text);
-      setUserToMakeChoice(current_loop_data.user_choice);
-      setChoiceOptions(current_loop_data.choices);
+      if (payload.new?.story_started) {
+        const current_loop_data = JSON.parse(
+          payload.new?.current_loop_json?.content
+        );
+        setCurrentLoopNumber(current_loop_data.loop);
+        setLoopText(current_loop_data.loop_text);
+        setUserToMakeChoice(current_loop_data.user_choice);
+        setChoiceOptions(current_loop_data.choices);
+
+        if (current_loop_data.loop > 1) {
+          const old_loop_data = JSON.parse(
+            payload.old?.current_loop_json?.content
+          );
+
+          if (current_loop_data.loop > old_loop_data.loop) {
+            setLoadingState(false);
+          }
+        }
+      }
       //
     }
   };
@@ -83,6 +113,7 @@ export default function play_room() {
     .subscribe();
 
   const setChoice = async (choice: number) => {
+    setLoadingState(true);
     await supabase
       .from("stories")
       .update({
@@ -90,6 +121,23 @@ export default function play_room() {
       })
       .eq("game_code", gamecode);
   };
+
+  if (loadingState) {
+    return (
+      <div className="flex-1 w-full flex flex-col items-center justify-center bg-create-bg bg-cover bg-no-repeat bg-center">
+        <Loader></Loader>
+      </div>
+    );
+  }
+
+  if (!storyData?.story_started) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen w-[80vw] gap-6">
+        <h1 className="text-[3rem]  text-primaryBlue">skytales</h1>
+        <h1 className="text-xl">Waiting for the story to start!</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-[80vw] gap-6">
@@ -100,23 +148,27 @@ export default function play_room() {
         </div>
 
         {!storyData?.story_finished &&
-          storyData?.current_player_choosing == playerName && (
+          storyData?.current_player_choosing.toLowerCase() ==
+            playerName.toLowerCase() && (
             <h1 className="text-2xl text-semibold">Make a choice!</h1>
           )}
 
         {!storyData?.story_finished &&
-          !storyData?.current_player_choosing == playerName && (
+          storyData?.current_player_choosing.toLowerCase() !=
+            playerName.toLowerCase() && (
             <h1 className="text-2xl text-semibold">
               {userToMakeChoice} is choosing...
             </h1>
           )}
       </Card>
-
       {!storyData?.story_finished && (
         <div className="flex flex-row w-full justify-between ">
           <div className="basis-1/2 flex flex-col gap-6 mr-4">
             <button
-              disabled={storyData?.current_player_choosing != playerName}
+              disabled={
+                storyData?.current_player_choosing.toLowerCase() !=
+                playerName.toLowerCase()
+              }
               onClick={() => {
                 setChoice(1);
               }}
@@ -125,7 +177,10 @@ export default function play_room() {
               {choiceOptions[1]}
             </button>
             <button
-              disabled={storyData?.current_player_choosing != playerName}
+              disabled={
+                storyData?.current_player_choosing.toLowerCase() !=
+                playerName.toLowerCase()
+              }
               onClick={() => {
                 setChoice(2);
               }}
@@ -137,7 +192,10 @@ export default function play_room() {
 
           <div className="basis-1/2 flex flex-col gap-6 ml-4">
             <button
-              disabled={storyData?.current_player_choosing != playerName}
+              disabled={
+                storyData?.current_player_choosing.toLowerCase() !=
+                playerName.toLowerCase()
+              }
               onClick={() => {
                 setChoice(3);
               }}
@@ -146,7 +204,10 @@ export default function play_room() {
               {choiceOptions[3]}
             </button>
             <button
-              disabled={storyData?.current_player_choosing != playerName}
+              disabled={
+                storyData?.current_player_choosing.toLowerCase() !=
+                playerName.toLowerCase()
+              }
               onClick={() => {
                 setChoice(4);
               }}
@@ -157,6 +218,7 @@ export default function play_room() {
           </div>
         </div>
       )}
+
       {storyData?.story_finished && (
         <button
           className="max-w-[30%] w-[30%] items-center justify-center py-4 flex text-xl font-semibold rounded-full bg-primaryBlue shadow-2xl text-white no-underline"
