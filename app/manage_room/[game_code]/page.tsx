@@ -284,7 +284,31 @@ export default function manage_room() {
         </div>
       ) : (
         allLoopJSON?.map((loopJson, index) => {
-          if (index == 0 || index == 1 || index % 2 != 0) {
+          if (index == 0) {
+            return (
+              <div className="flex flex-col items-center justify-center w-[80vw]">
+                <Card className="text-xl p-10">
+                  <h1>Game Code: {gamecode}</h1>
+                  <h1>Grade Level: {storyData?.grade_level}</h1>
+                  <h1>
+                    Players:{" "}
+                    {JSON.stringify(storyData?.current_players)
+                      .replace("[", "")
+                      .replace("]", "")}
+                  </h1>
+                  <h1>Theme: {storyData?.theme}</h1>
+                  <h1>
+                    Loop: {storyData?.current_loop}/
+                    {storyData.loop_count * storyData.max_player_count}
+                  </h1>
+                  <h1>
+                    Player Currently Choosing:
+                    {storyData?.current_player_choosing}
+                  </h1>
+                </Card>
+              </div>
+            );
+          } else if (index == 1 || index % 2 != 0) {
             return null;
           } else {
             return (
