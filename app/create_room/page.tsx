@@ -3,6 +3,8 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Loader from "@/components/loadingSpinner";
 
 type Inputs = {
   theme: string;
@@ -14,6 +16,11 @@ type Inputs = {
 export default function create_room() {
   const supabase = createClient();
   const router = useRouter();
+  const [loadingState, setLoadingState] = useState(false);
+
+  useEffect(() => {
+    setLoadingState(false);
+  }, []);
 
   const {
     register,
@@ -22,6 +29,7 @@ export default function create_room() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    setLoadingState(true);
     console.log(formData);
     const { data, error } = await supabase
       .from("stories")
@@ -41,6 +49,14 @@ export default function create_room() {
 
     router.push(`/manage_room/${data[0].id.toString().substring(0, 8)}`);
   };
+
+  if (loadingState) {
+    return (
+      <div className="flex-1 w-full flex flex-col items-center justify-center bg-create-bg bg-cover bg-no-repeat bg-center">
+        <Loader></Loader>
+      </div>
+    );
+  }
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
@@ -116,6 +132,7 @@ export default function create_room() {
       <button
         className="my-4 max-w-[45%] w-[45%] items-center justify-center px-8 py-4 flex text-xl font-semibold rounded-full bg-white shadow-2xl text-primaryBlue no-underline"
         onClick={() => {
+          setLoadingState(true);
           router.push("/");
         }}
       >

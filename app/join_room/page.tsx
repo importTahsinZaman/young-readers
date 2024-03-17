@@ -3,6 +3,8 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Loader from "@/components/loadingSpinner";
 
 type Inputs = {
   gamecode: string;
@@ -12,6 +14,7 @@ type Inputs = {
 export default function join_room() {
   const supabase = createClient();
   const router = useRouter();
+  const [loadingState, setLoadingState] = useState(false);
 
   const {
     register,
@@ -19,7 +22,12 @@ export default function join_room() {
     formState: { errors },
   } = useForm<Inputs>();
 
+  useEffect(() => {
+    setLoadingState(false);
+  }, []);
+
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    setLoadingState(true);
     //attempt to find room data:
     const { data, error } = await supabase
       .from("stories")
@@ -31,8 +39,10 @@ export default function join_room() {
       const story_data = data[0];
 
       if (story_data.current_player_count >= story_data.max_player_count) {
+        setLoadingState(false);
         alert("MAX PLAYERS REACHED!");
       } else if (data[0].current_players?.includes(formData.name)) {
+        setLoadingState(false);
         alert("THIS PLAYER IS ALREADY IN THE ROOM!");
       } else {
         const newPlayerCount = story_data.current_player_count + 1;
@@ -55,9 +65,18 @@ export default function join_room() {
         router.push(`/play_room/${formData.gamecode}/${formData.name}`);
       }
     } else {
+      setLoadingState(false);
       alert("INVALID GAME CODE");
     }
   };
+
+  if (loadingState) {
+    return (
+      <div className="flex-1 w-full flex flex-col items-center justify-center bg-home-bg bg-cover bg-no-repeat bg-center">
+        <Loader></Loader>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-center bg-join-bg bg-cover bg-no-repeat bg-center">
@@ -92,6 +111,7 @@ export default function join_room() {
       <button
         className="max-w-[40%] w-[40%] items-center justify-center py-4 flex text-2xl font-semibold rounded-full bg-primaryBlue shadow-2xl text-white no-underline"
         onClick={() => {
+          setLoadingState(true);
           router.push("/");
         }}
       >
