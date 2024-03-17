@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
 import { Card } from "@tremor/react";
+import { useRouter } from "next/navigation";
 
 export default function manage_room() {
+  const router = useRouter();
   const supabase = createClient();
   const pathname = usePathname();
   const [gamecode, setGamecode] = useState("");
@@ -299,7 +301,7 @@ export default function manage_room() {
                   <h1>Theme: {storyData?.theme}</h1>
                   <h1>
                     Loop: {storyData?.current_loop}/
-                    {storyData.loop_count * storyData.max_player_count}
+                    {storyData.loop_count * storyData.max_player_count + 1}
                   </h1>
                   <h1>
                     Player Currently Choosing:
@@ -310,9 +312,32 @@ export default function manage_room() {
             );
           } else if (index == 1 || index % 2 != 0) {
             return null;
+          } else if (
+            JSON.parse(loopJson.content)["loop"] ==
+            storyData?.loop_count * storyData?.max_player_count + 1
+          ) {
+            return (
+              <div className="flex flex-col items-center justify-center w-[80vw] gap-6">
+                <h1 className="text-xl">
+                  Loop: {JSON.parse(loopJson.content)["loop"]} /{" "}
+                  {storyData.loop_count * storyData.max_player_count + 1}
+                </h1>
+                <Card className="flex flex-col min-h-[55vh] rounded mx-4 items-center justify-between shadow-lg p-10">
+                  <div className="grow">
+                    <h1 className="text-xl">
+                      {JSON.parse(loopJson.content)["loop_text"]}
+                    </h1>
+                  </div>
+                </Card>
+              </div>
+            );
           } else {
             return (
               <div className="flex flex-col items-center justify-center w-[80vw] gap-6">
+                <h1 className="text-xl">
+                  Loop: {JSON.parse(loopJson.content)["loop"]} /{" "}
+                  {storyData.loop_count * storyData.max_player_count + 1}
+                </h1>
                 <Card className="flex flex-col min-h-[55vh] rounded mx-4 items-center justify-between shadow-lg p-10">
                   <div className="grow">
                     <h1 className="text-xl">
@@ -359,6 +384,16 @@ export default function manage_room() {
             );
           }
         })
+      )}
+      {storyData?.story_finished && (
+        <button
+          className="max-w-[30%] w-[30%] items-center justify-center py-4 flex text-xl font-semibold rounded-full bg-primaryBlue shadow-2xl text-white no-underline"
+          onClick={() => {
+            router.push("/");
+          }}
+        >
+          return home
+        </button>
       )}
     </div>
   );
