@@ -4,12 +4,14 @@ import { createClient } from "@/utils/supabase/client";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
+import { Card } from "@tremor/react";
 
 export default function manage_room() {
   const supabase = createClient();
   const pathname = usePathname();
   const [gamecode, setGamecode] = useState("");
   const [storyData, setStoryData] = useState<any[] | null>(null);
+  const [allLoopJSON, setAllLoopJSON] = useState<any[] | null>(null);
 
   const openai = new OpenAI({
     apiKey: process.env.NEXT_PUBLIC_OPEN_AI_API_KEY,
@@ -26,12 +28,14 @@ export default function manage_room() {
         .select("*")
         .eq("game_code", slug);
       setStoryData(data[0]);
+      setAllLoopJSON(data[0].all_loop_json);
     };
     getData();
   }, [pathname]);
 
   const handleChanges = (payload: any) => {
     setStoryData(payload.new);
+    setAllLoopJSON(payload.new.all_loop_json);
 
     if (
       payload.eventType == "UPDATE" &&
@@ -105,7 +109,7 @@ export default function manage_room() {
       alert("Max players not reached!");
     } else {
       try {
-        const initMessage = `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": “”, ”4”: "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. The choice options given to a player should be choices for what THAT player does in the story, a player should not receive choices that determine the actions of a different player in the story! Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 4 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! EACH LOOP SHOULD CONTAIN ABOUT 180 WORDS. Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`;
+        const initMessage = `Your job is to write a multiplayer choose your own adventure story. There are going to be users who correspond to characters in the story, and your job is to write an interactive story based on a given theme. The "loop" parameter is how many times each user will be given the opportunity to make a choice in the story.  EVERY one of your responses should be A SINGLE loop, IN JSON FORMAT (this is mandatory) of { "loop": (loop number), "loop_text": (the text in the loop), "user_choice": (which user is making a choice), "choices": { "1": "", "2": "", "3": “”, ”4”: "" } } So if there are 4 loops and 5 characters, there will be 20 total choices made (4 choices by each of 5 characters/users.) The story should change based on the choice made in each loop. The choice options given to a player should be choices for what THAT player does in the story, a player should not receive choices that determine the actions of a different player in the story! Give one loop at a time and the user will input which choice they want. Write the story from the third person. There should be 4 choice options per loop. The very last loop should be #(number of players * number of loops) + 1. This loop should conclude the story, without giving a choice to any user. So if there are 4 loops and 5 characters/users, the last loop would be loop #21. THE USER WILL INPUT THEIR CHOICE AFTER EVERY LOOP, DO NOT DECIDE IT FOR YOURSELF. One user should not be in charge of making the choice for more than 2 loops in a row! EACH LOOP SHOULD CONTAIN ABOUT 180 WORDS OR ABOUT 14 SENTENCES. Here are the parameters: { Theme: ${storyData?.theme}, Characters: ${storyData?.current_players}, Loops: ${storyData?.loop_count} Grade Level: ${storyData?.grade_level} }`;
 
         const completion = await openai.chat.completions.create({
           messages: [
@@ -244,10 +248,20 @@ export default function manage_room() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col items-center justify-center bg-create-bg bg-cover bg-no-repeat bg-center gap-6">
-      <h1 className="text-[8rem] text-primaryBlue">skytales</h1>
+    <div
+      className={`flex-1 w-full flex flex-col items-center justify-center bg-create-bg bg-cover bg-no-repeat bg-center gap-6 ${
+        storyData?.story_started && "mb-6"
+      }`}
+    >
+      <h1
+        className={`${
+          !storyData?.story_started ? "text-[8rem]" : "text-[4rem]"
+        } text-primaryBlue`}
+      >
+        skytales
+      </h1>
       {!storyData?.story_started ? (
-        <div className="flex w-full flex flex-col items-center justify-center">
+        <div className="flex w-full flex-col items-center justify-center">
           <h1 className="text-4xl font-semibold">Game Code: {gamecode}</h1>
           <h1 className="text-xl font-semibold">
             Players Joined: {storyData?.current_player_count}/
@@ -269,36 +283,59 @@ export default function manage_room() {
           )}
         </div>
       ) : (
-        <div>
-          <h1 className="text-lg font-semibold">Theme: {storyData?.theme}</h1>
-          <h1 className="text-lg font-semibold">
-            Grade Level: {storyData?.grade_level}
-          </h1>
-          <h1 className="text-lg font-semibold">
-            Loop: {storyData?.current_loop}/{storyData?.loop_count}
-          </h1>
-          <h1 className="text-lg font-semibold">
-            Current Player Choosing: {storyData?.current_player_choosing}
-          </h1>
-          <h1>FINISH STYLING THIS PAGE!</h1>
-        </div>
-      )}
+        allLoopJSON?.map((loopJson, index) => {
+          if (index == 0 || index == 1 || index % 2 != 0) {
+            return null;
+          } else {
+            return (
+              <div className="flex flex-col items-center justify-center w-[80vw] gap-6">
+                <Card className="flex flex-col min-h-[55vh] rounded mx-4 items-center justify-between shadow-lg p-10">
+                  <div className="grow">
+                    <h1 className="text-xl">
+                      {JSON.parse(loopJson.content)["loop_text"]}
+                    </h1>
+                  </div>
 
-      {/* <div className="max-w-[50%]">
-        <pre>{JSON.stringify(storyData, null, 2)}</pre>
-      </div>
-      {storyData?.story_started ? null : (
-        <div className="flex flex-col">
-          {removePlayerButtons}
-          <button
-            onClick={() => {
-              startStory();
-            }}
-          >
-            Start Story
-          </button>
-        </div>
-      )} */}
+                  <h1 className="text-2xl text-semibold">
+                    {JSON.parse(loopJson.content)["user_choice"]}'s choice...
+                  </h1>
+                </Card>
+                <div className="flex flex-row w-full justify-between ">
+                  <div className="basis-1/2 flex flex-col gap-6 mr-4">
+                    <button
+                      disabled
+                      className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#03CD9D] shadow text-white no-underline w-full"
+                    >
+                      {JSON.parse(loopJson.content)["choices"][1]}
+                    </button>
+                    <button
+                      disabled
+                      className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#EEAA26] shadow text-white no-underline w-full"
+                    >
+                      {JSON.parse(loopJson.content)["choices"][2]}
+                    </button>
+                  </div>
+
+                  <div className="basis-1/2 flex flex-col gap-6 ml-4">
+                    <button
+                      disabled
+                      className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#E84646] shadow text-white no-underline w-full"
+                    >
+                      {JSON.parse(loopJson.content)["choices"][3]}
+                    </button>
+                    <button
+                      disabled
+                      className="items-center justify-center py-4 flex text-lg font-semibold rounded-full bg-[#59B941] shadow text-white no-underline w-full"
+                    >
+                      {JSON.parse(loopJson.content)["choices"][4]}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+        })
+      )}
     </div>
   );
 }
